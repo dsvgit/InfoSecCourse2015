@@ -425,10 +425,276 @@ Texmaker с помощью функции Быстрый старт позвол
 \item --export (--import) – экспорт/импорт ваших ключей, например, для резервирования или переноса на другой компьютер. По умолчанию ключи в бинарном виде, для получения их в ASCI-виде укажите параметр –armor.
 \end{itemize}
 
+Рассмотрим подробней механизм работы с gpg при использовании командной строки:
+Для начала сгенерируем ключ: 
+
+gpg --gen-key
+
+gpg предложит выбрать тип ключа - возможные варианты: 
+
+\begin{verbatim}
+Выберите тип ключа:
+   (1) RSA и RSA (по умолчанию)
+   (2) DSA и Elgamal
+   (3) DSA (только для подписи)
+   (4) RSA (только для подписи)
+\end{verbatim}
+
+Выберем вариант по умолчанию - RSA и RSA.
+
+Далее выбираем размер ключа - 2048.
+
+\begin{verbatim}
+Какой размер ключа Вам необходим? (2048)
+Запрошенный размер ключа - 2048 бит
+\end{verbatim}
+
+Затем срок действия - после того как пройдет этот период времени ключ станет недействительным. Выберем 0 - без ограничений.
+
+\begin{verbatim}
+Срок действия ключа? (0)
+Срок действия ключа не ограничен
+Все верно? (y/N) y
+\end{verbatim}
+
+После этого программа попросит ввести личные данные и фразу-пароль. Введем эти данные:
+
+\begin{verbatim}
+Ваше настоящее имя: John_
+Адрес электронной почты: john@yandex.ru
+Комментарий: comment
+Вы выбрали следующий ID пользователя:
+    "John_ (comment) <john@yandex.ru>"
+\end{verbatim}
+
+И наконец сгенерирует ключ: 
+
+\begin{verbatim}
+gpg: проверка таблицы доверия
+gpg: 3 ограниченных необходимо, 1 выполненных необходимо, модель доверия PGP
+gpg: глубина: 0  корректных:   7  подписанных:   0  доверия: 0-, 0q, 0n, 0m, 0
+ 7u
+pub   2048R/614E98E4 2015-05-25
+      Отпечаток ключа = E7F4 E52E F0EB BF3F 6088  70C2 C9B0 CF07 614E 98E4
+uid     [абсолютное] John_ (comment) <john@yandex.ru>
+sub   2048R/DFC70E94 2015-05-25
+\end{verbatim}
+
+Если теперь выполнить команду:
+
+\begin{verbatim}
+gpg --list-keys
+\end{verbatim}
+
+то увидим в списке вновь созданный ключ:
+
+\begin{verbatim}
+pub   2048R/614E98E4 2015-05-25
+uid     [абсолютное] John_ (comment) <john@yandex.ru>
+sub   2048R/DFC70E94 2015-05-25
+\end{verbatim}
+
+далее сделаем две вещи: 
+\begin{itemize}
+\item зашифруем информацию, для того чтобы потом расшифровать
+\item подпишем файл для того, чтобы потом проверить менялся ли он(для этого далее проведем верификацию)
+\end{itemize}
+
+Шифрование. Для того, чтобы можно было в последующем на другой машине расшифровать/верифицировать наши файлы необходимо экспортировать ключ. Воспользуемся для этого ключем --export. Пример команды:
+
+\begin{verbatim}
+gpg --export -a John_
+\end{verbatim}
+
+Увидим следующее:
+
+\begin{verbatim}
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v2
+
+mQENBFVjNFgBCADLmmQ2AAjtdqRbZKvwbjSEhme9jFX8DXyJajDLh3gMCm8+vnjW
+7zyXIuPQn7yD6hA7t/1u2x/ltFv4N0HUwFMgzYO+P/QcWin//9V3QKEZJRNqe6a8
+X49W5+iJyXLULrFb8UebGJ2QeR+cyJ8HtQx2E3qsOz5OoBlXRjxjovUWvXNF9PzU
+Ddw5oPKOnC2w9Lbg76jz+1AENo7aFNuWsaZ0xkE291X5+Gkeuy0cE/j9g329v+6K
+OUZ80i4r3JumJ40QLEnbjPUtVYKzuQxa8d0lNOngvOFKHL6NixOc7e0ihnHoN/Zx
+zUjnMKH1TuxLX23D1dGvTz4lkYliLMoEzKTDABEBAAG0IEpvaG5fIChjb21tZW50
+KSA8am9obkB5YW5kZXgucnU+iQE5BBMBCAAjBQJVYzRYAhsDBwsJCAcDAgEGFQgC
+CQoLBBYCAwECHgECF4AACgkQybDPB2FOmOS2mAgArjCYrh22t2JaF+Tvj7jJwonb
+4hHMHX5joRQmWBmWLbhgj2V+KkcyR+14ZoW4zZ6itl0vK4bb3xbDjls36gxWCz93
+isiJa4xJRweJnSSguxNo53HSPyBo8iq6xS9IjEA6zybJPhodD5934OXao857IuJo
+NexvNB6KyowujQtbvLtfgCWcT/MNJoWP5YLB8A6olKkUdPIwVrvQxXVekg9Q0+jB
+mR0++RM1l+ZapQHzJID8nEBVaDaMLMovpr35CK2xSXFDMEhdBjOfievgepMx8p/8
+g+uk6HFgvs8u6lBxhSRwWeQPkVs0SOuIvL7//1jvZWy7uWLszWtoco8IDCLDcbkB
+DQRVYzRYAQgAvcPb77ah4DlTS8tcHjq8zTf6zkwm3hjYVLgPbNJUdSmFlSsP9KKG
+gUSkjEp6uyN2Kg0DSu4g9c9SkdwO8CNL92KI4Ht+g1GLz+NhJT3Z2wyaiVCdtOn8
+2JcVVlNplrZvq4BCBAX3/1RphIu+U37QxZ46UGU/iotOVCZpMnRB5VTzN9OMjCIU
+/tNJEZKXqhaErY9M1Y8YLsVExvUnkJM9uVLt1LMssUyVYmMfUG8M9hQZU31AisFG
+WIZPqZjKu1Q0n78P4QzjL1XS07RhBPboshc2ONu33wgEJExqHUUszaMbocE40d7i
+3I6bEFzoS8T8YEQ/u8Lma2aIgokVUTRuJQARAQABiQEfBBgBCAAJBQJVYzRYAhsM
+AAoJEMmwzwdhTpjkOwQH/0uEsZReyTbdifoniiKUy0h9Zq0QWBQsa9gzcIM0oyr+
+Ku+QBhFwtnroQ1MNjCOn/ysoAb1pWmgPPf2N5hYit54xS30xGOfcBfRnUh1S/YxE
+D5SvIM3GjoEe2k4lKQkNfoA7lPFMdgSkloLHKZK2JRcraq7uGUoY6ufakhPXX8ql
+UUyLclo4tJyx43Drbnpql5aJ3HIQxhUD6xUBA40NluoWpkfY8ZfwXCEU1WPxsFnh
+wNbqLDHx2hG2x8152lxHVKcMj22RdhK5KBrVA5lfujxyGzFLjc1N4QJztqCwqNbJ
++Kqg5vA4mzS5+vnr9Fy4sQ9QmqTmhhXelsjuEqVhg9k=
+=YDll
+-----END PGP PUBLIC KEY BLOCK-----
+\end{verbatim}
+
+Сделаем вывод в файл, чтобы потом отправить его на удаленную машину:
+
+\begin{verbatim}
+gpg --export -a John_ >John.asc
+\end{verbatim}
+
+В текущей папке появиться файл John.asc. Отправим его на удаленныую машину после чего импортируем. Команда импорта и результат:
+
+\begin{verbatim}
+root@ubuntu:~/Загрузки$ gpg --import John.asc
+gpg: ключ 614E98E4: открытый ключ "John_ (comment) <john@yandex.ru>" импортирован
+gpg: Всего обработано: 1
+gpg:               импортировано: 1  (RSA: 1)
+
+\end{verbatim}
+
+Теперь если посмотреть список ключей увидим в том числе и наш:
+
+\begin{verbatim}
+root@ubuntu:~/Загрузки$ gpg --list-keys
+/root/.gnupg/pubring.gpg
+------------------------
+pub   2048R/48E59386 2015-05-13
+uid                  Bob__ <bob@yandex.ru>
+
+pub   2048R/2AD7FC08 2015-05-11
+uid                  Alice <alice@gmail.com>
+
+pub   1024D/7C77ACF9 2015-05-25
+uid                  Dima_ (comment) <dima@yandex.ru>
+sub   1024g/2B1C5A2D 2015-05-25
+
+pub   2048R/614E98E4 2015-05-25
+uid                  John_ (comment) <john@yandex.ru>
+sub   2048R/DFC70E94 2015-05-25
+\end{verbatim}
+
+Теперь перейдем к шифрованию: зашифруем файл на удаленной машине, после чего скинем его на основную и расшифруем. Файл - message\_to\_john. Содержание: 
+
+\begin{verbatim}
+Hello, John!
+\end{verbatim}
+
+Выполним команду: 
+\begin{verbatim}
+root@ubuntu:~/Загрузки$ gpg -ea -r John_ message_to_john
+\end{verbatim}
+
+В папке появиться файл: message\_to\_john.asc. 
+
+Содержание:
+\begin{verbatim}
+-----BEGIN PGP MESSAGE-----
+Version: GnuPG v1
+
+hQEMAy7Q0nvfxw6UAQf+K/0hgvOl8SfK7z8+B3KGmbZWhfNOinUKsstCH6YKYtu2
+nrkyhFs8wjBKPcW6ozSVPF2o+gPaFWe8eugrMuB5YmoVEWWdCadOJnsgtAGGVlsR
+6vcuEt13mOoM6J+Bp7DSB+aeEvUtXzHVa3C16+SDE7ZqVuevtzWXAa29IQygGMMn
+LrLPTlcCAVeZlNoXpvOIDyHG3qzsP52Xrr9y2IY/lfHTYuLvoAyJUpa+KMEm8zdd
+gG+JiuGZTZaX8w/LtyBSLx67FAZwS/B38bp3rJ6XRbDnH7RNugRadh6AH9YGYAT+
+ZQf/1CkBk61chfuL4HTkHz0SWFUxuGKw+c6UYXdNDNJWASMGI6Xho2IXfE9QPZ3E
+ZPSmXiVsq58cW09W4mX4h79l9SLeTmVBaVsVzh7kiN6epM4iuM+7fCW8K8x7uzmL
+oVtnxVrMIlSysLBy5MpO7rAhdIzI3HI=
+=9k5I
+-----END PGP MESSAGE-----
+\end{verbatim}
+
+Скинем его на основную машину, чтобы расшифровать закрытым ключем. 
+Введем команду:
+
+\begin{verbatim}
+gpg -d message_to_john.asc >message_to_john.txt
+\end{verbatim}
+
+Прогамма ответит и потребует ввести фразу-пароль:
+
+\begin{verbatim}
+
+Необходим пароль для доступа к закрытому ключу пользователя: "John_ (comment)
+ohn@yandex.ru>"
+2048-битный ключ RSA, ID DFC70E94, создан 2015-05-25 (ID главного ключа 614E98
+)
+
+gpg: зашифровано 2048-битным ключом RSA, с ID DFC70E94, созданным 2015-05-25
+      "John_ (comment) <john@yandex.ru>"
+\end{verbatim}
+
+Тем самым получим исхоный файл. С содеражнием:
+\begin{verbatim}
+Hello, John!
+\end{verbatim}
+
+Цифровая подпись. Далее рассмотрим другой вариант использования gpg, когда нужно не шифровать файл а ставить электронную подпись. На удаленной машине введем команду:
+
+\begin{verbatim}
+gpg --clearsign -a message\_to\_john
+\end{verbatim}
+
+Получим файл message\_to\_john.asc с содержанием:
+
+\begin{verbatim}
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+Hello, John!
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJVY1r3AAoJEI5UpplI5ZOGoWwIAObDda3SfJJ2OWr/6qsPbEs3
+CP+WzDiBbAc1wFrByTpuDLt4dxatQKeY1O8EzF4xOJnKrjo9JoQqrrH5DyMq10NO
+L9Oo3Lqq6xTcf1vhPusGPHo8qT9rl7bSPiDkQ9Xhov/5BzTeCvuin1h6PVXKn07z
+AJYF/8FUSJJpD6EPVyQ4hcUDnSg2K/nJsGJpxdaHzJ49koLnNro1rSkOew0l3h3Q
+P/4jiW48XTKtJW9MY6NclyCZpYJalnLhTTG6/3MtnNk53lffn/qpCNH/Q+NxAjLz
+wqfOjyfYpSUk3evP/KmhZ3qphoDH95S9oGzfRzHVnogrm1WGuBGA2OQxR71hl/g=
+=FPDa
+-----END PGP SIGNATURE-----
+\end{verbatim} 
+
+Теперь, если его расшифровать получим такой же файл как и был(см. выше). Если файл верифицировать, то можно увидеть слеующую информацию:
+
+\begin{verbatim}
+gpg --verify message_to_john.asc
+
+gpg: Подпись создана 05/25/15 20:25:11 RTZ 2 (чшьр) ключом RSA с ID 48E59386
+gpg: Действительная подпись от "Bob__ <bob@yandex.ru>" [неизвестной]
+gpg: ВНИМАНИЕ: Данный ключ не заверен доверенной подписью!
+gpg:           Нет указаний на то, что подпись принадлежит владельцу.
+Отпечаток главного ключа: EC71 8B72 E0A5 1345 483A  0639 8E54 A699 48E5 9386
+gpg: ВНИМАНИЕ: не отделенная подпись; файл `message_to_john' НЕ был проверен!
+\end{verbatim}
+
+Так же можно сделать отдельную подпись следующим образом:
+
+\begin{verbatim}
+root@ubuntu:~/Загрузки$ gpg --detach-sign -a message_to_john
+
+Необходим пароль для доступа к секретному ключу пользователя: "Bob__ <bob@yandex.ru>"
+2048-бит RSA ключ, ID 48E59386, создан 2015-05-13
+\end{verbatim}
+
+Теперь отправим файлы на основную машину и верефицируем. Получим следующее сообщение:
+
+\begin{verbatim}
+gpg: предполагается, что подписанные данные находятся в `message_to_john'
+gpg: Подпись создана 05/25/15 20:40:23 RTZ 2 (чшьр) ключом RSA с ID 48E59386
+gpg: Действительная подпись от "Bob__ <bob@yandex.ru>" [неизвестной]
+gpg: ВНИМАНИЕ: Данный ключ не заверен доверенной подписью!
+gpg:           Нет указаний на то, что подпись принадлежит владельцу.
+Отпечаток главного ключа: EC71 8B72 E0A5 1345 483A  0639 8E54 A699 48E5 9386
+\end{verbatim}
+
 %---------------------------------------------------------
 
 \subsection{Выводы}
-В ходе выполнения третьего пункта лабораторной работы была освоена программа Kleopatra, входящая в пакет Gpg4win и используемая для шифрования и подписи GPG. Была создана пара ключей OpenGPG, в которой закрытый ключ защищен при помощи passphrase, а открытый ключ распространяется как сертификат(файл с расширением .asc). Произведен импорт нескольких сертификатов, что позволило зашифровать файлы, которые могут быть расшифрованы только владельцами этих сертификатов. Также была произведена подпись документов и соответственно проверка целостности и подлинности этих и других документов. Для проверки целостности и подлинности файла необходим сам файл, а также файл подписи.
-
+В ходе выполнения третьего пункта лабораторной работы была освоена программа Kleopatra, входящая в пакет Gpg4win и используемая для шифрования и подписи GPG. Ранее не имев дела с подобными программами был впечатлен простотой подписей и работой с ними. Следует отметить, что программа позволяет использовать сервера с ключами, что тоже удобно. Надеюсь в будующем полученный опыт пригодится.
 
 \end{document}
