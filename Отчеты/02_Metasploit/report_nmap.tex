@@ -17,7 +17,7 @@
 
 
 \author{Дедков Сергей}
-\title{Отчет по лабораторной работе №1 :\\ \LaTeX{}, Git, GPG}
+\title{Отчет по лабораторной работе №4 :\\ Утилита для исследования сети и сканер портов nmap}
 \date{2015}
 
 %---------------------------------------------------------
@@ -46,12 +46,21 @@
 
 \subsection{Провести поиск активных хостов}
 
-Так как наш компьюер находиться в подсети 192.168.76.0/24 выполним поиск в ней(для определения воспользовались командой ifconfig). Для этого воспользуемся командой nmap 192.168.76.0/24.
-В результате видим 5 хостов, один из них - виртуальная машина с запущенной metasploit, а именно с ip адресом 192.168.76.136. См. рисунок 1.
+Настройки сети: в нашей сети имеется всего 3 хоста.
+
+\begin{itemize}
+\item Windows 8 (192.168.150.1), основная ОС
+\item kali linux (192.168.150.2)
+\item metasploitable2 (192.168.150.3)
+\end{itemize}
+
+Выведем список хостов в подсети 192.168.150.0/24
+
+Для этого воспользуемся командой \verb'nmap -sn 192.168.150.0/24'. (См. рисунок 1)
 
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.75]{res/hosts_search}
+\includegraphics[scale=0.8]{res/hosts_search}
 \caption{Поиск хостов}
 \end{figure}
 
@@ -59,12 +68,14 @@
 
 \subsection{Определить открытые порты}
 
-Для определения открытых портов достаточно просто ввести nmap 192.168.76.136 (сканируются порты до 1024). Или же воспользоваться опцией -p, например nmap -p "*" 192.168.76.136. Данной командой просканируются все порты, если необходимо задать диапазон достаточно указать его вместо "*".
-После ввода команды увидим результат, как на рисунке 2.
+Просканируем порты metasploitable2.
+
+Для определения открытых портов достаточно просто ввести \verb'nmap 192.168.150.3' (сканируются порты до 1024). Или же воспользоваться опцией -p, например \verb'nmap -p "*" 192.168.150.3'. Данной командой просканируются все порты, если необходимо задать диапазон достаточно указать его вместо "*".
+Результат на рисунке 2.
 
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.75]{res/ports_scan}
+\includegraphics[scale=0.8]{res/ports_scan}
 \caption{Поиск портов}
 \end{figure}
 
@@ -72,11 +83,12 @@
 
 \subsection{Определить версии сервисов}
 
-Чтобы определить версии сервисов необходимо воспользоваться командой nmap с ключем sV следующим образом: nmap -sV 192.168.76.136. На рисунке 3 можно увидеть результат.
+Чтобы определить версии сервисов необходимо воспользоваться командой nmap с ключем sV следующим образом: \verb'nmap -sV 192.168.150.3'. 
+Результат на рисунке 3.
 
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.75]{res/services_versions}
+\includegraphics[scale=0.8]{res/services_versions}
 \caption{Определение версий сервисов}
 \end{figure}
 
@@ -211,7 +223,7 @@ namespace ExampleTcpListener_Console
 
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.75]{res/server_response}
+\includegraphics[scale=0.8]{res/server_response}
 \caption{Вывод информации о сервисе}
 \end{figure}
 
@@ -223,13 +235,13 @@ namespace ExampleTcpListener_Console
 
 Для того, чтобы вывести данные в xml файл достаточно вызвать команду nmap с ключем -oX и указать имя файла. Например: 
 
-\verb'namp -sn -oX output.xml 192.168.137.1'
+\verb'namp -sn -oX output.xml 192.168.150.1'
 
 Результат можно увидеть на рисунке 7:
 
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.75]{res/xml_output}
+\includegraphics[scale=0.8]{res/xml_output}
 \caption{output.xml}
 \end{figure}
 
@@ -237,14 +249,82 @@ namespace ExampleTcpListener_Console
 
 \subsection{Исследовать различные этапы и режимы работы nmap с использованием утилиты Wireshark}
 
-Запустим утилиту Wireshark, выберем интерфейс eth0 и нажмем Start. Будет произведено сканирование сети и вывод передаваемых по сети пакетов. Пропингуем с ОС Metasploitable2 основную ОС и проверим, будет ли утилита Wireshark видеть подобную активность сети? Как видно из рисунка 14, утилита отображает информацию об активности в сети. Так же можно посмотреть информацию о соединении и передаваемых пакетах, а в некоторых случаях и перехватить cookie.
+Wireshark — это достаточно известный инструмент для захвата и анализа сетевого трафика, фактически стандарт как для образования, так и для траблшутинга. 
+Wireshark работает с подавляющим большинством известных протоколов, имеет понятный и логичный графический интерфейс на основе GTK+ и мощнейшую систему фильтров.
+Кроссплатформенный, работает в таких ОС как Linux, Solaris, FreeBSD, NetBSD, OpenBSD, Mac OS X, и, естественно, Windows. Распространяется под лицензией GNU GPL v2. Доступен бесплатно на сайте wireshark.org.
+
+Далее продемонстрируем простую работу с wireshark. При запуске wireshark предложит выбрать интерфейс и начать сканировать его траффик(см. рисунок 8). Выберем интерфейс eth0
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{res/wireshark_int}
+\caption{wireshark выбор интерфейса и старт}
+\end{figure}
+
+Wireshark по-умолчанию выводит все пакеты, которые проходят через интерфейс eth0. Все пакеты просматривать неудобно, поэтому мы будем пользоваться фильтрами. Поставим фильтр по протоколу icmp, ip отправителя и получателя: 
+
+\verb'ip.src == 192.168.150.2 and ip.dst == 192.168.150.3 and icmp'. 
+
+Введем команду для определения ОС в подсети 192.168.150.0/24 
+
+\verb'nmap -O 192.168.150.0/24'.
+
+Результат на рисунке 9. Увидим три пакета
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{res/wireshark_scan_icmp}
+\caption{wireshark scan}
+\end{figure}
+
+По каждому запросу можно увидеть дополнительую информацию кликнув на нем, как, например, на рисунке 10.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{res/wireshark_info}
+\caption{wireshark info}
+\end{figure}
 
 %---------------------------------------------------------
 
 \subsection{Просканировать виртуальную машину Metasploitable2 используя nmap\_db из состава metasploit-framework}
 
-Запустив metasploit, мы можем воспользоваться командой nmap\_db
+Для работы с metasploit потребуется СУБД postgresql. Для того, чтобы ее запустить воспользуемся командой 
 
+\verb'service postgressql start'
+
+Затем запустим msf консоль командой \verb'msfconsole'.
+
+В данной консоли осуществляется работа с metasplit. Проверим соединение с БД:
+
+\verb'db_status'
+
+Результат на рисунке 11.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{res/db_status}
+\caption{db\_status}
+\end{figure}
+
+Таблицы БД: hosts, services, vulns, loot и notes. В каждой храниться соответствующая информация.
+Для заполнения этих таблиц автоматизированно, можно использовать db\_nmap. Так же можно использовать какую-то любую утилиту для сканирования, экспортировать результаты её работы в XML-файл, а потом - импортировать его в метасплойт. Это можно сделать, использовав db\_import внутри меню метасплойт.
+
+Выполним команду: \verb'db_nmap -sV 192.168.150.0/24'
+
+Вывод будет такой же как и при использовании команы nmap. Теперь после того как была просканирована наша сеть можно посмотреть, что было записано в БД: \verb'hosts', \verb'services'. Результаты на рисунках 12 и 13.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{res/msf_hosts}
+\caption{Таблица хостов}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{res/msf_services}
+\caption{Таблица сервисов}
+\end{figure}
 
 %---------------------------------------------------------
 
@@ -253,11 +333,11 @@ namespace ExampleTcpListener_Console
 \begin{itemize}
 \item Первая запись
 
-Возьмем самую первую запсись prode - эта запись теста с отправкой null-запроса. В данной записи будет отправляться пустой запрос по протоколу TCP. С ожиданием ответа в 6 секунд(директива totalwaitms).
+Возьмем самую первую запсись probe - эта запись теста с отправкой null-запроса. В данной записи будет отправляться пустой запрос по протоколу TCP. С ожиданием ответа в 6 секунд(директива totalwaitms).
 
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.75]{res/probe_1}
+\includegraphics[scale=0.8]{res/probe_1}
 \caption{Запись 1}
 \end{figure}
 
@@ -267,32 +347,177 @@ namespace ExampleTcpListener_Console
 
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.75]{res/probe_2}
+\includegraphics[scale=0.8]{res/probe_2}
 \caption{Запись 2}
 \end{figure}
 
 \item Третья запись
 
-В данной запись на сервер отправляется запрос по протоколу TCP в котором передается информация. Так же 
+В данной запись на сервер отправляется запрос по протоколу TCP в котором передается информация. Так же указан список портов и ssl-портов, по которым нужно осуществлять сканирование.
 
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{res/probe_3}
+\caption{Запись 3}
+\end{figure}
+
+\item Четвертая запись
+
+Здесь отправляется запрос по протоколу UDP для проверки RPC.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{res/probe_4}
+\caption{Запись 4}
+\end{figure}
+
+\item Пятая запись
+
+Здесь отправляется запрос по протоколу UDP для проверки sql, через порт 1434.
 
 
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.75]{res/probe_3}
-\caption{Запись 3}
+\includegraphics[scale=0.8]{res/probe_5}
+\caption{Запись 5}
 \end{figure}
 
 
 
+
+\item Скрипт
+
+Рассмотрим следующий скрипт \verb'skypev2-version.nse'. Его можно найти в папке с отчетом.
+
+Первым делом в нем объявлены переменные импортированные из библиотек:
+
+\begin{verbatim}
+local comm = require "comm"
+local nmap = require "nmap"
+local shortport = require "shortport"
+local string = require "string"
+local U = require "lpeg-utility"
+\end{verbatim}
+
+Далее следует описание скрипта в переменной \verb'description':
+
+\begin{verbatim}
+description = [[
+Detects the Skype version 2 service.
+]]
+\end{verbatim}
+
+Далее описание в комментарии в формате NSEDoc.
+
+\begin{verbatim}
+---
+-- @output
+-- PORT   STATE SERVICE VERSION
+-- 80/tcp open  skype2  Skype
+\end{verbatim}
+
+Далее имя автора, лицензия, категория:
+
+\begin{verbatim}
+author = "Brandon Enright"
+license = "Same as Nmap--See http://nmap.org/book/man-legal.html"
+categories = {"version"}
+\end{verbatim}
+
+Далее правило порта(вместо него можно задавать правило хоста) - функция возвращающая true или false. Если возвращает true, то выполняется функция заданная в перемнной action. В данном случае из кода понятно, в каких случая выполняется это условие.
+ 
+\begin{verbatim}
+portrule = function(host, port)
+  return (port.number == 80 or port.number == 443 or
+    port.service == nil or port.service == "" or
+    port.service == "unknown") -- условия по портам
+  and port.protocol == "tcp" and port.state == "open" -- условия по протоколу
+  and port.version.name_confidence < 10 -- доверие
+  and not(shortport.port_is_excluded(port.number,port.protocol)) -- порт не исключен
+  and nmap.version_intensity() >= 7 -- версия интенсивности
+end
+\end{verbatim}
+
+Далее приведен код функции action:
+
+\begin{verbatim}
+action = function(host, port)
+  local result, rand
+  -- Did the service engine already do the hard work?
+  if port.version and port.version.service_fp then
+    -- Probes sent, replies received, but no match.
+    result = U.get_response(port.version.service_fp, "GetRequest")
+    -- Loop through the ASCII probes most likely to receive random response
+    -- from Skype. Others will also recieve this response, but are harder to
+    -- distinguish from an echo service.
+    for _, p in ipairs({"HTTPOptions", "RTSPRequest"}) do
+      rand = U.get_response(port.version.service_fp, p)
+      if rand then
+        break
+      end
+    end
+  end
+  local status
+  if not result then
+    -- Have to send the probe ourselves.
+    status, result = comm.exchange(host, port,
+      "GET / HTTP/1.0\r\n\r\n", {bytes=26})
+
+    if (not status) then
+      return nil
+    end
+  end
+
+  if (result ~= "HTTP/1.0 404 Not Found\r\n\r\n") then
+    return
+  end
+
+  -- So far so good, now see if we get random data for another request
+  if not rand then
+    status, rand = comm.exchange(host, port,
+      "random data\r\n\r\n", {bytes=15})
+
+    if (not status) then
+      return
+    end
+  end
+
+  if string.match(rand, "[^%s!-~].*[^%s!-~].*[^%s!-~]") then
+    -- Detected
+    port.version.name = "skype2"
+    port.version.product = "Skype"
+    nmap.set_port_version(host, port)
+    return
+  end
+  return
+end
+\end{verbatim}
+
+После прохождения всех проверок, обозначается версия и продукт(после комментария Detected).
+
+Для использования скрипта нужно ввести либо ключ -sC, либо --script=<имя\_скрипта>.
+
+Для примера была просканирована основная ОС. Двумя способами. Результаты можно увидеть на рисунках 19 и 20.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{res/script_1}
+\caption{Результаты сканирования без использования скрипта}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{res/script_2}
+\caption{Результаты сканирования с использованием скрипта}
+\end{figure}
+
 \end{itemize}
 
+%---------------------------------------------------------
 
+\section{Вывод}
 
-
-
-
-
+В ходе проделанной работы были изучены основы работы с nmap, немного изучен сниффер wireshark, а так же запись в БД metasploit посредством команды db\_nmap. Ранее я не был знаком с подобными программами, поэтому не с чем сравнивать. В общем интересно было посканировать хосты и порты. Понравилось так же что можно писать собственные скрипты, но для того, чтобы подробно с ними разобраться нужно больше времени. 
 
 
 \end{document}

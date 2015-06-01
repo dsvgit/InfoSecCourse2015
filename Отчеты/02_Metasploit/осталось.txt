@@ -1,5 +1,0 @@
-xmas scanning
-
-nmap db
-
-script lua
